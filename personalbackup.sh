@@ -55,7 +55,7 @@ function main()
 	fi
 }
 
-if [ $# -gt 2 -o $# -eq 0 -o  $# -eq 1 ]; then
+if [ $# -ne 2 ]; then
 	echo "Usage: backupdir backupfile"
 else
 	main
