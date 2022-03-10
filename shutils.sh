@@ -2,21 +2,17 @@
 
 # RENAME MULTIPLE FILES IN DIR TO A COMMON EXTENSION
 # *.JPG -> *.jpg
-
-
-# FUNCTION NOT WORKING, THE 'toext' variable is not being
-# readed in the sh -c '...' part
-function OTNext()
+function old_to_new_ext()
 {
-	echo -n "Full directory path: "
-	read -r dir
-	echo -n "From extension (zip, bz2, jpeg, ...): "
-	read -r frext
-	echo -n "To extension: "
-	read -r toext
-	# TESTING
-	find "$dir" -name "*.$frext" -exec sh -c "for f; do echo "$f" "${f%.*}.${toext}"; done" {} +
+	read -p "Full directory path: " dir
+	read -p "From extension (zip, bz2, jpeg, ...): " frext
+	read -p "To extension: " toext
 
+	frextfiles="$(find "${dir}" -name "*.${frext}")"
+	for file in $frextfiles; do
+	    mv "$file" "${file%.*}.${toext}";
+	done
+	exit 0
 }
 # Function that cut away part of a long file name
 # and preserves extension
@@ -41,23 +37,24 @@ function cut_long_fname()
 	echo ''
 	echo "$n items renamed"
 	rm /tmp/tmpfnames
+	exit 0
 }
 
 echo "Function description - Function Name"
-echo "Old ext to new ext - OTNext"
+echo "Old ext to new ext - old_to_new_ext"
 echo "Cut long file names - cut_long_fname"
 echo ""
 
 if [ $# -ne 1 ]; then
 	echo "Usage: shutils.sh funcname"
-	exit
+	exit 1
 fi
 
-if [[ $1 == "OTNext" ]]; then
-	OTNext
+if [[ $1 == "old_to_new_ext" ]]; then
+	old_to_new_ext
 elif [[ $1 == "cut_long_fname" ]]; then
 	cut_long_fname
 else
 	echo "No function with that name"
-	exit
+	exit 1
 fi
