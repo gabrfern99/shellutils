@@ -17,27 +17,17 @@ function backupItens()
 {
     while read itens; do
 	for iten in "$itens"; do
-	    filteredItem="$(basename $iten)"
-	    if [[ -d "$BACKUPDIR$filteredItem" || -f "$BACKUPDIR$filteredItem" ]]; then
-		continue
-	    else
-		rsync -avh "$iten" "$BACKUPDIR" 2> /dev/null
-	    fi
+	    rsync -avh "$iten" "$BACKUPDIR" 2> /dev/null
 	done
     done < <(grep . "$BACKUPFILE")
-
+    
 }
 
 function checkChangedItens()
 {
     while read itens; do
 	for iten in "$itens"; do
-	    filteredItem="$(basename $iten)"
-	    if [[ $(diff -qr "$iten" "$BACKUPDIR$filteredItem" 2>/dev/null) ]]; then
-		rsync -avh "$iten" "$BACKUPDIR" 2> /dev/null
-	    else
-		continue
-	    fi
+	    rsync -avh "$iten" "$BACKUPDIR" 2> /dev/null
 	done
     done < <(grep . "$BACKUPFILE")
 }
