@@ -1,12 +1,21 @@
 #!/bin/bash
 
+
+usage ()
+{
+    echo "Function description - Function Name"
+    echo "Old ext to new ext - old_to_new_ext"
+    echo "Cut long file names - cut_long_fname"
+    echo ""
+    echo "$0 -d <Directory path> -f <Function name>"
+    exit 0
+}
 # RENAME MULTIPLE FILES IN DIR TO A COMMON EXTENSION
 # *.JPG -> *.jpg
 function old_to_new_ext()
 {
-	read -p "Full directory path: " dir
-	read -p "From extension (zip, bz2, jpeg, ...): " frext
-	read -p "To extension: " toext
+	read -p "Current file extension: " frext
+	read -p "To file extension: " toext
 
 	frextfiles="$(find "${dir}" -name "*.${frext}")"
 	for file in $frextfiles; do
@@ -18,8 +27,6 @@ function old_to_new_ext()
 # and preserves extension
 function cut_long_fname()
 {
-	echo -n "Full directory path: "
-	read -r dir
 
 	find "$dir" -type f > /tmp/tmpfnames
 	n=0
@@ -40,21 +47,25 @@ function cut_long_fname()
 	exit 0
 }
 
-echo "Function description - Function Name"
-echo "Old ext to new ext - old_to_new_ext"
-echo "Cut long file names - cut_long_fname"
-echo ""
+[ $# -eq 0 ] && usage
+while getopts "hd:f:" arg; do
+    case $arg in
+	d)
+	    dir="${OPTARG}"
+	    ;;
+	f)
+	    funcname="${OPTARG}"
+	    ;;
+	h | *)
+	    usage
+	    ;;
+    esac
+done
 
-if [ $# -ne 1 ]; then
-	echo "Usage: shutils.sh funcname"
-	exit 1
-fi
+[[ -z $dir || -z $funcname ]] && echo "No directory or function name specified" && exit 1
+[[ ! -d $dir ]] && echo "$dir is not a directory" && exit 1
+[[ $funcname != "old_to_new_ext" && $funcname != "cut_long_fname" ]] && echo "No function with that name: $funcname" && exit 1
+[[ $funcname == "old_to_new_ext" ]] && old_to_new_ext
+[[ $funcname == "cut_long_fname" ]] && cut_long_fname
 
-if [[ $1 == "old_to_new_ext" ]]; then
-	old_to_new_ext
-elif [[ $1 == "cut_long_fname" ]]; then
-	cut_long_fname
-else
-	echo "No function with that name"
-	exit 1
-fi
+    
