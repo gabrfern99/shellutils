@@ -15,21 +15,9 @@ function createBackupDir()
 
 function backupItens()
 {
-    while read itens; do
-	for iten in "$itens"; do
+    while IFS= read -r iten; do
 	    rsync -avh "$iten" "$BACKUPDIR" 2> /dev/null
-	done
-    done < <(grep . "$BACKUPFILE")
-    
-}
-
-function checkChangedItens()
-{
-    while read itens; do
-	for iten in "$itens"; do
-	    rsync -avh "$iten" "$BACKUPDIR" 2> /dev/null
-	done
-    done < <(grep . "$BACKUPFILE")
+    done < "$BACKUPFILE"
 }
 
 function main()
@@ -37,7 +25,6 @@ function main()
     createBackupDir
     if [ -f "$BACKUPFILE" ]; then
 	backupItens
-	checkChangedItens
     else
 	echo "No file with itens to backup"
 	exit 1
