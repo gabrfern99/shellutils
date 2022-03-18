@@ -19,7 +19,7 @@ function old_to_new_ext()
 
 	frextfiles="$(find "${dir}" -name "*.${frext}")"
 	n=0
-	for file in $frextfiles; do
+	for file in "$frextfiles"; do
 	    n=$((n+1))
 	    mv "$file" "${file%.*}.${toext}";
 	done
