@@ -17,13 +17,19 @@ function old_to_new_ext()
 	read -p "Current file extension: " frext
 	read -p "To file extension: " toext
 
-	frextfiles="$(find "${dir}" -name "*.${frext}")"
+	frextfiles="$(find "$dir" -name "*.${frext}")"
+	echo "$frextfiles" > /tmp/frextfiles
 	n=0
-	for file in "$frextfiles"; do
+	if [ -s "/tmp/frextfiles" ]; then
+	    echo "No files to modify"
+	    exit 1
+	fi
+	while IFS= read -r file; do
 	    n=$((n+1))
-	    mv "$file" "${file%.*}.${toext}";
-	done
+	    mv "$file" "${file%.*}.${toext}"
+	done < /tmp/frextfiles
 	echo "$n files renamed"
+	rm /tmp/frextfiles
 	exit 0
 }
 # Function that cut away part of a long file name
