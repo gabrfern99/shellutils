@@ -20,7 +20,7 @@ function old_to_new_ext()
 	frextfiles="$(find "$dir" -name "*.${frext}")"
 	echo "$frextfiles" > /tmp/frextfiles
 	n=0
-	if [ -s "/tmp/frextfiles" ]; then
+	if [ ! -s "/tmp/frextfiles" ]; then
 	    echo "No files to modify"
 	    exit 1
 	fi
