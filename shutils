@@ -6,6 +6,7 @@ usage ()
     echo "Function ID - Function description"
     echo -e "\t1 - Old ext to new ext"
     echo -e "\t2 - Cut long file names"
+    echo -e "\t3 - Convert from type to new type"
     echo -e "\t-v  verbose"
     echo "$0 -d <Directory path> -f <Function ID>"
     exit 0
@@ -61,6 +62,35 @@ function cut_long_fname()
 	rm /tmp/tmpfnames
 	exit 0
 }
+function convert_to()
+{
+	read -p "Convert from: " frext
+	read -p "Convert to: " toext
+
+	frextfiles="$(find "$dir" -name "*.${frext}")"
+	echo "$frextfiles" > /tmp/frconvfiles
+	n=0
+	if [ ! -s "/tmp/frconvfiles" ]; then
+	    echo "No files to modify"
+	    exit 1
+	fi
+	while IFS= read -r file; do
+	    n=$((n+1))
+	    filenoext="${file%.*}"
+	    filenewext="${toext}"
+	    todest="$(echo "$filenoext"."$filenewext")"
+	    sleep 10
+	    ffmpeg -nostdin -loglevel 0 -v quiet -i "$file" -vcodec libx264 -acodec copy "$todest"
+	    if [ $verbose ]; then
+		echo "File converted: $file"
+	    fi
+	done < /tmp/frconvfiles
+	echo "Total files renamed: $n"
+	rm /tmp/frconvfiles
+	exit 0
+
+    
+}
 
 [ $# -eq 0 ] && usage
 while getopts "hvd:f:" arg; do
@@ -82,8 +112,9 @@ done
 
 [[ -z $dir || -z $funcid ]] && echo "No directory or function name specified" && exit 1
 [[ ! -d $dir ]] && echo "$dir is not a directory" && exit 1
-[[ $funcid != "1" && $funcid != "2" ]] && echo "No function with that name: $funcid" && exit 1
+[[ $funcid != "1" && $funcid != "2" && $funcid != "3" ]] && echo "No function with that name: $funcid" && exit 1
 [[ $funcid == "1" ]] && old_to_new_ext
 [[ $funcid == "2" ]] && cut_long_fname
+[[ $funcid == "3" ]] && convert_to
 
     
