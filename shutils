@@ -79,7 +79,6 @@ function convert_to()
 	    filenoext="${file%.*}"
 	    filenewext="${toext}"
 	    todest="$(echo "$filenoext"."$filenewext")"
-	    sleep 10
 	    ffmpeg -nostdin -loglevel 0 -v quiet -i "$file" -vcodec libx264 -acodec copy "$todest"
 	    if [ $verbose ]; then
 		echo "File converted: $file"
