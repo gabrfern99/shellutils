@@ -7,6 +7,7 @@ usage ()
     echo -e "\t1 - Old ext to new ext"
     echo -e "\t2 - Cut long file names"
     echo -e "\t3 - Convert from type to new type"
+    echo -e "\t4 - Remove substring from file"
     echo -e "\t-v  verbose"
     echo "$0 -d <Directory path> -f <Function ID>"
     exit 0
@@ -84,10 +85,35 @@ function convert_to()
 		echo "File converted: $file"
 	    fi
 	done < /tmp/frconvfiles
-	echo "Total files renamed: $n"
+	echo "Total files converted: $n"
 	rm /tmp/frconvfiles
 	exit 0
 
+    
+}
+
+function remove_substring()
+{
+	read -p "Substring to remove: " frstring
+
+	frstrfiles="$(find "$dir" -type f)"
+	echo "$frstrfiles" > /tmp/frstrfiles
+	n=0
+	if [ ! -s "/tmp/frstrfiles" ]; then
+	    echo "No files to modify"
+	    exit 1
+	fi
+	while IFS= read -r file; do
+	    n=$((n+1))
+	    toremove="$frstring"
+	    mv "${file}" "${file/$toremove}"
+	    if [ $verbose ]; then
+		echo "Removed substring: ${file/$toremove}"
+	    fi
+	done < /tmp/frstrfiles
+	echo "Total files renamed: $n"
+	rm /tmp/frstrfiles
+	exit 0
     
 }
 
@@ -111,9 +137,10 @@ done
 
 [[ -z $dir || -z $funcid ]] && echo "No directory or function name specified" && exit 1
 [[ ! -d $dir ]] && echo "$dir is not a directory" && exit 1
-[[ $funcid != "1" && $funcid != "2" && $funcid != "3" ]] && echo "No function with that name: $funcid" && exit 1
+[[ $funcid != "1" && $funcid != "2" && $funcid != "3" && $funcid != "4" ]] && echo "No function with that name: $funcid" && exit 1
 [[ $funcid == "1" ]] && old_to_new_ext
 [[ $funcid == "2" ]] && cut_long_fname
 [[ $funcid == "3" ]] && convert_to
+[[ $funcid == "4" ]] && remove_substring
 
     
